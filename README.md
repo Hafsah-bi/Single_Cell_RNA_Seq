@@ -289,7 +289,9 @@ Download and concatenate two 10X Multiome samples into a single AnnData object.
 import anndata as ad
 import scanpy as sc
 import pooch
- 
+
+sc.set_figure_params(dpi=50, facecolor="white")
+
 def download_sample(sample_id, known_hash):
     path = pooch.retrieve(
         path=pooch.os_cache("scverse_tutorials"),
