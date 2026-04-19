@@ -19,12 +19,6 @@ This stage converts sequencing reads into an initial expression matrix suitable 
 
 ### a. Data upload and organization
 
-At the beginning of the workflow, the required input files are uploaded and organized in the analysis environment. These commonly include:
-
-- **FASTQ files** generated from sequencing
-- Reference files required for alignment and quantification
-- Associated metadata, where applicable
-
 Create a new Galaxy history and rename it, for example:
 
 - `scRNA-seq 10X dataset tutorial`
@@ -154,31 +148,72 @@ At this stage, confirm that most reads map well, most usable reads are assigned 
 
 ## Step 3: Producing a Quality Count Matrix
 
-The final stage refines the initial matrix to retain barcodes that most likely represent genuine cells.
+The RNA STARsolo output matrix is provided in bundled 10x format (`matrix.mtx`, `genes.tsv`, `barcodes.tsv`). While this format is compatible with downstream single-cell workflows, it includes many low-quality or background barcodes. To generate a more representative count matrix, filter barcodes with **DropletUtils**.
 
-### a. Cell Ranger Method
+### a. Cell Ranger-like filtering
 
-The **Cell Ranger method** applies the standard 10x Genomics approach for identifying valid cells and generating a filtered count matrix. This method provides an established default strategy for selecting cell-associated barcodes.
+Use **DropletUtils** to emulate the default Cell Ranger-style barcode filtering approach.
 
-### b. Introspective Method
+**Tool**
+- **DropletUtils** (`Galaxy version 1.10.0+galaxy2`)
 
-The **introspective method** applies manual or semi-manual evaluation of barcode distributions to derive a quality-controlled matrix.
+| **Setting** | **Value** |
+|---|---|
+| Format for the input matrix | Bundled (`barcodes.tsv`, `genes.tsv`, `matrix.mtx`) |
+| Count Data | `Matrix Gene Counts` |
+| Genes List | `Genes` |
+| Barcodes List | `Barcodes` |
+| Operation | Filter for Barcodes |
+| Method | DefaultDrops |
+| Expected Number of Cells | `3000` |
+| Upper Quantile | `0.99` |
+| Lower Proportion | `0.1` |
+| Format for output matrices | Bundled (`barcodes.tsv`, `genes.tsv`, `matrix.mtx`) |
 
-#### i. Rank Barcodes
+### b. Introspective method
 
-Barcode ranking is used to visualize count distributions and distinguish likely cells from background signal. This enables inspection of barcode abundance patterns before applying filtering criteria.
+For a more data-driven approach, first inspect barcode distributions and then apply custom filtering.
 
-#### ii. Custom Filtering
+#### i. Rank barcodes
 
-Custom filtering allows the analyst to define thresholds according to dataset-specific characteristics.
+Generate a barcode rank plot to visualize total UMI counts across barcodes and help identify the transition between real cells and background droplets.
 
-This may involve:
+**Tool**
+- **DropletUtils** (`Galaxy version 1.10.0+galaxy2`)
 
-- Removing low-count barcodes
-- Excluding poor-quality observations
-- Retaining barcodes supported by expected count and feature profiles
+| **Setting** | **Value** |
+|---|---|
+| Format for the input matrix | Bundled (`barcodes.tsv`, `genes.tsv`, `matrix.mtx`) |
+| Count Data | `Matrix Gene Counts` |
+| Genes List | `Genes` |
+| Barcodes List | `Barcodes` |
+| Operation | Rank Barcodes |
+| Lower Bound | `100` |
 
-This approach is useful when standard filtering does not fully capture the structure or quality characteristics of the dataset.
+#### ii. Custom filtering
+
+Apply **EmptyDrops** for barcode filtering based on statistical significance.
+
+**Tool**
+- **DropletUtils** (`Galaxy version 1.10.0+galaxy2`)
+
+| **Setting** | **Value** |
+|---|---|
+| Format for the input matrix | Bundled (`barcodes.tsv`, `genes.tsv`, `matrix.mtx`) |
+| Count Data | `Matrix Gene Counts` |
+| Genes List | `Genes` |
+| Barcodes List | `Barcodes` |
+| Operation | Filter for Barcodes |
+| Method | EmptyDrops |
+| Lower-bound Threshold | `200` |
+| FDR Threshold | `0.01` |
+| Format for output matrices | Bundled (`barcodes.tsv`, `genes.tsv`, `matrix.mtx`) |
+
+### Notes
+- The bundled matrix is highly sparse because it includes many low-count barcodes.
+- **DefaultDrops** is a simple Cell Ranger-like option.
+- **Rank Barcodes + EmptyDrops** provides a more flexible and interpretable filtering strategy.
+- The filtered output can be used as a higher-quality input for downstream single-cell analysis.
 
 ---
 
