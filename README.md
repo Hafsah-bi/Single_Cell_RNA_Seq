@@ -101,32 +101,54 @@ This step performs:
 
 ### b. Inspecting the Output Files
 
-Following quantification, the resulting files should be examined carefully to assess data quality and interpretability.
+RNA STARsolo produces six main outputs:
+
+| **Output** | **Description** |
+|---|---|
+| Log | Program log and mapping statistics |
+| Feature Statistic Summaries | Barcode and quantification metrics |
+| Alignments | BAM file of mapped reads |
+| Matrix Gene Counts | Count matrix in Matrix Market format |
+| Barcodes | Cell barcode list |
+| Genes | Gene list |
+
+The **log** and **feature summaries** files are the main sources for quality assessment. The matrix, barcode, and gene files together form the unfiltered count matrix.
 
 #### i. Mapping Quality
 
-Mapping quality evaluation focuses on how effectively reads align to the reference.
+Use **MultiQC** to inspect the STAR log.
 
-Key aspects include:
+**Tool:** `MultiQC (Galaxy version 1.27+galaxy0)`
 
-- Proportion of reads successfully mapped
-- Fraction of uniquely assigned reads
-- General consistency of alignment outcomes
+| **Setting** | **Value** |
+|---|---|
+| Which tool was used generate logs? | STAR |
+| Type of STAR output? | Log |
+| STAR log output | `RNA STARsolo: log` |
 
-These metrics help determine whether the sequencing data and reference preparation are suitable for reliable downstream analysis.
+**Result:**  
+- **Uniquely mapped reads:** `87.5%`
+
+This indicates good alignment quality.
 
 #### ii. Quantification Quality
 
-Quantification quality concerns the reliability of expression estimates across cell barcodes.
+Inspect the **Feature Statistic Summaries** file directly in Galaxy.
 
-Typical points of inspection include:
+Key metric groups:
 
-- Distribution of counts across barcodes
-- Number of detected genes
-- UMI-based transcript counting patterns
-- Identification of potential empty droplets or low-information barcodes
+| **Metric** | **Meaning** |
+|---|---|
+| Barcode mismatch metrics | Reads with barcodes not matching the whitelist |
+| `noUnmapped + MultiFeature` | Reads without clear feature assignment |
+| `yessubWLmatch_UniqueFeature` | Reads successfully counted |
 
-This step provides the basis for selecting high-confidence cellular observations.
+**Key observations**
+- **Detected cells (`yesCellBarcodes`)**: ~`5200`
+- **Largest category**: `yessubWLmatch_UniqueFeature`
+- **`noNoFeature`** reads may be relatively high and are generally expected for this dataset
+
+At this stage, confirm that most reads map well, most usable reads are assigned to features, and the detected barcode count is reasonable.
 
 ---
 
