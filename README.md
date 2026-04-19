@@ -25,8 +25,29 @@ At the beginning of the workflow, the required input files are uploaded and orga
 - Reference files required for alignment and quantification
 - Associated metadata, where applicable
 
-Proper file organization is necessary to ensure that downstream quantification tools interpret read structure and sample identity correctly.
+Create a new Galaxy history and rename it, for example:
 
+- `scRNA-seq 10X dataset tutorial`
+
+Then import the required input files from Zenodo or the Galaxy data library.
+
+### Input files
+
+| **File type** | **File** | **Link** |
+|---|---|---|
+| FASTQ | `subset_pbmc_1k_v3_S1_L001_R1_001.fastq.gz` | [Download](https://zenodo.org/record/3457880/files/subset_pbmc_1k_v3_S1_L001_R1_001.fastq.gz) |
+| FASTQ | `subset_pbmc_1k_v3_S1_L001_R2_001.fastq.gz` | [Download](https://zenodo.org/record/3457880/files/subset_pbmc_1k_v3_S1_L001_R2_001.fastq.gz) |
+| FASTQ | `subset_pbmc_1k_v3_S1_L002_R1_001.fastq.gz` | [Download](https://zenodo.org/record/3457880/files/subset_pbmc_1k_v3_S1_L002_R1_001.fastq.gz) |
+| FASTQ | `subset_pbmc_1k_v3_S1_L002_R2_001.fastq.gz` | [Download](https://zenodo.org/record/3457880/files/subset_pbmc_1k_v3_S1_L002_R2_001.fastq.gz) |
+| Gene annotation | `Homo_sapiens.GRCh37.75.gtf` | [Download](https://zenodo.org/record/3457880/files/Homo_sapiens.GRCh37.75.gtf) |
+| Barcode whitelist | `3M-february-2018.txt.gz` | [Download](https://zenodo.org/record/3457880/files/3M-february-2018.txt.gz) |
+
+### Notes
+- Create and rename a new history before uploading files.
+- Import data directly via Zenodo links or from the Galaxy data library.
+- At the end of this step, the history should contain **4 FASTQ files**, **1 GTF file**, and **1 barcode whitelist file**.
+
+Proper file organization is necessary to ensure that downstream quantification tools interpret read structure and sample identity correctly.
 ---
 
 ## Step 2: Performing the Demultiplexing and Quantification
