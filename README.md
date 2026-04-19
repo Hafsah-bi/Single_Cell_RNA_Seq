@@ -48,6 +48,7 @@ Then import the required input files from Zenodo or the Galaxy data library.
 - At the end of this step, the history should contain **4 FASTQ files**, **1 GTF file**, and **1 barcode whitelist file**.
 
 Proper file organization is necessary to ensure that downstream quantification tools interpret read structure and sample identity correctly.
+
 ---
 
 ## Step 2: Performing the Demultiplexing and Quantification
