@@ -402,11 +402,10 @@ sc.pl.umap(adata, color="sample")
 Cluster cells using the Leiden graph-clustering algorithm at multiple resolutions.
  
 ```python
-sc.tl.leiden(adata, key_added="leiden_res0_02", resolution=0.02)
-sc.tl.leiden(adata, key_added="leiden_res0_5",  resolution=0.5)
-sc.tl.leiden(adata, key_added="leiden_res2",    resolution=2)
+#sc.tl.leiden(adata, flavor="igraph")
+sc.tl.leiden(adata)
  
-sc.pl.umap(adata, color=["leiden_res0_02", "leiden_res0_5", "leiden_res2"], legend_loc="on data")
+sc.pl.umap(adata, color=["leiden"])
 ```
  
 ---
@@ -420,8 +419,25 @@ adata.obs["predicted_doublet"] = adata.obs["predicted_doublet"].astype("category
 sc.pl.umap(adata, color=["leiden", "predicted_doublet", "doublet_score"], wspace=0.5)
  
 adata = adata[~adata.obs["predicted_doublet"].to_numpy()].copy()
+sc.pl.umap(
+    adata, color=["leiden", "log1p_total_counts", "pct_counts_mt", "log1p_n_genes_by_counts"], wspace=0.5, ncols=2
+)
 ```
- 
+
+#### Leiden clustering algorithm
+
+```python
+sc.tl.leiden(adata, key_added="leiden_res0_02", resolution=0.02)
+sc.tl.leiden(adata, key_added="leiden_res0_5", resolution=0.5)
+sc.tl.leiden(adata, key_added="leiden_res2", resolution=2)
+
+sc.pl.umap(
+    adata,
+    color=["leiden_res0_02", "leiden_res0_5", "leiden_res2"],
+    legend_loc="on data",
+)
+```
+
 ---
  
 ### Step 10 — Cell-Type Annotation
