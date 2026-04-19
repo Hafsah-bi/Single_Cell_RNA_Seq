@@ -234,3 +234,39 @@ These steps establish the foundation for downstream single-cell RNA-seq analyses
 This repository is based on the following tutorial:
 
 - [Galaxy Training Network: Pre-processing of 10x Single-Cell RNA Datasets](https://training.galaxyproject.org/training-material/topics/single-cell/tutorials/scrna-preprocessing-tenx/tutorial.html)
+
+# Basic scRNA-seq analysis
+
+A complete end-to-end workflow for preprocessing, clustering, and annotating
+single-cell RNA-seq data using **Scanpy**, **CellTypist**, and **decoupler**,
+based on the NeurIPS 2021 benchmarking dataset (bone marrow mononuclear cells).
+
+---
+
+## 📁 Notebook
+
+`basic-scrna-tutorial_updated.ipynb`
+
+---
+
+## 📦 Requirements
+
+### Python Version
+- Python 3.8+
+
+### Install Dependencies
+
+```bash
+pip install anndata scanpy pooch
+pip install scrublet
+pip install leidenalg igraph
+pip install celltypist decoupler omnipath
+
+
+
+
+
+
+
+
+
