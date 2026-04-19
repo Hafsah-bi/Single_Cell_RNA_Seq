@@ -55,7 +55,51 @@ Proper file organization is necessary to ensure that downstream quantification t
 
 This stage assigns reads to cellular barcodes and transcripts, then generates output files summarizing alignment and quantification results.
 
-### a. Inspecting the Output Files
+### a. RNA STARsolo
+
+Run **RNA STARsolo** in Galaxy using the following configuration to perform barcode-aware alignment and quantification.
+
+### Tool
+- **RNA STARsolo** (`Galaxy version 2.7.11a+galaxy1`)
+
+### Parameters
+
+| **Setting** | **Value** |
+|---|---|
+| Custom or built-in reference genome | Use a built-in index |
+| Reference genome with or without an annotation | Use genome reference without builtin gene-model |
+| Select reference genome | Human (*Homo sapiens*): hg19 Full or Human (*Homo sapiens*) (b37): hg19 |
+| Gene model (gff3, gtf) file for splice junctions | `Homo_sapiens.GRCh37.75.gtf` |
+| Length of genomic sequence around annotated junctions | `100` |
+| Type of single-cell RNA-seq | Drop-seq or 10X Chromium |
+| Input Type | Separate barcode and cDNA reads |
+| RNA-Seq FASTQ/FASTA file, Barcode reads | `L001_R1_001`, `L002_R1_001` |
+| RNA-Seq FASTQ/FASTA file, cDNA reads | `L001_R2_001`, `L002_R2_001` |
+| RNA-Seq Cell Barcode Whitelist | `3M-february-2018.txt.gz` |
+| Configure Chemistry Options | Chromium chemistry v3 |
+| UMI deduplication (collapsing) algorithm | CellRanger2-4 algorithm |
+| Type of UMI filtering | Remove UMIs with N and homopolymers |
+| Matching the Cell Barcodes to the WhiteList | Multiple matches (CellRanger 2, 1MM_multi) |
+| Strandedness of Library | Read strand same as the original RNA molecule |
+| Collect UMI counts for these genomic features | Gene: Count reads matching the Gene Transcript |
+| Cell filter type and parameters | Do not filter |
+| Field 3 in the Genes output | Gene Expression |
+
+### Input selection
+Use multi-select for the FASTQ files:
+
+- **Barcode reads:** `L001_R1_001`, `L002_R1_001`
+- **cDNA reads:** `L001_R2_001`, `L002_R2_001`
+
+### Purpose
+This step performs:
+
+- alignment to the human reference genome,
+- barcode and UMI processing,
+- transcript quantification,
+- generation of an initial unfiltered count matrix for downstream quality assessment.
+
+### b. Inspecting the Output Files
 
 Following quantification, the resulting files should be examined carefully to assess data quality and interpretability.
 
