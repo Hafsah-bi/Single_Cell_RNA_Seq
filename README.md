@@ -215,6 +215,9 @@ Apply **EmptyDrops** for barcode filtering based on statistical significance.
 | FDR Threshold | `0.01` |
 | Format for output matrices | Bundled (`barcodes.tsv`, `genes.tsv`, `matrix.mtx`) |
 
+![Detected Cells Plot](images/3_Detected_Cells.png)
+> *Figure 3: EmptyDrops detected-cells plot showing total UMI count versus negative log probability for each barcode. Barcodes with stronger evidence of deviating from the ambient RNA background are identified as likely real cells.*
+
 ### Notes
 - The bundled matrix is highly sparse because it includes many low-count barcodes.
 - **DefaultDrops** is a simple Cell Ranger-like option.
