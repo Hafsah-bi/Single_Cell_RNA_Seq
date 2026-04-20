@@ -193,6 +193,9 @@ Generate a barcode rank plot to visualize total UMI counts across barcodes and h
 | Operation | Rank Barcodes |
 | Lower Bound | `100` |
 
+![Barcode Rank Plot](images/2_Barcode_Ranks.png)
+> *Figure 2: Barcode rank plot showing total UMI counts across ranked barcodes. The knee and inflection points indicate the approximate thresholds separating high-RNA cell-containing droplets from low-count empty droplets, providing a rough estimate of the expected number of cells in the sample.*
+
 #### ii. Custom filtering
 
 Apply **EmptyDrops** for barcode filtering based on statistical significance.
