@@ -137,6 +137,9 @@ Key metric groups:
 | `noUnmapped + MultiFeature` | Reads without clear feature assignment |
 | `yessubWLmatch_UniqueFeature` | Reads successfully counted |
 
+![RNA STARsolo Log Output](images/1_RNA_STARSolo_Log_Output.png)
+> *Figure 1: RNA STARsolo feature statistic summary showing barcode matching and gene assignment metrics, including uniquely assigned reads, reads without annotated features, and the number of detected cell barcodes.*
+
 **Key observations**
 - **Detected cells (`yesCellBarcodes`)**: ~`5200`
 - **Largest category**: `yessubWLmatch_UniqueFeature`
