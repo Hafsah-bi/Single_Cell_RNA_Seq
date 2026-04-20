@@ -250,21 +250,20 @@ A step-by-step single-cell RNA sequencing (scRNA-seq) analysis pipeline using **
 
 ---
 
-## 📁 Notebook
+##  Notebook
 
 `basic-scrna-tutorial_updated.ipynb`
 
 ---
  
-## 📋 Overview
- 
+## Overview
 This tutorial walks through a complete scRNA-seq analysis workflow on **bone marrow mononuclear cells** from healthy human donors (OpenProblems NeurIPS 2021 benchmarking dataset), measured with the **10X Multiome Gene Expression and Chromatin Accessibility kit**.
  
 **Dataset:** 8,785 cells × 36,601 genes across 2 samples (`s1d1`, `s1d3`)
  
 ---
  
-## 🔧 Installation
+##  Installation
  
 ```bash
 pip install anndata scanpy pooch scrublet leidenalg celltypist decoupler omnipath
@@ -273,7 +272,7 @@ pip install --upgrade scanpy igraph leidenalg
  
 ---
  
-## 📦 Dependencies
+##  Dependencies
  
 | Package | Purpose |
 |---|---|
@@ -288,230 +287,14 @@ pip install --upgrade scanpy igraph leidenalg
  
 ---
  
-## 🚀 Workflow
+##  Workflow
  
-### Step 1 — Load Data
- 
-Download and concatenate two 10X Multiome samples into a single AnnData object.
- 
-```python
-import anndata as ad
-import scanpy as sc
-import pooch
 
-sc.set_figure_params(dpi=50, facecolor="white")
-
-def download_sample(sample_id, known_hash):
-    path = pooch.retrieve(
-        path=pooch.os_cache("scverse_tutorials"),
-        url=f"https://exampledata.scverse.org/tutorials/neurips-2021/{sample_id}_filtered_feature_bc_matrix.h5",
-        known_hash=known_hash,
-    )
-    sample_adata = sc.read_10x_h5(path)
-    sample_adata.var_names_make_unique()
-    return sample_adata
- 
-samples = {
-    "s1d1": "md5:a99285913ea3f3d22600d3d2f8a88e34",
-    "s1d3": "md5:825f7f7578e3dc0b8955f5a97a402338",
-}
-adatas = {id_: download_sample(id_, h) for id_, h in samples.items()}
-adata = ad.concat(adatas, label="sample")
-adata.obs_names_make_unique()
 ```
  
 ---
  
-### Step 2 — Quality Control
- 
-Annotate mitochondrial, ribosomal, and hemoglobin genes, then calculate QC metrics.
- 
-```python
-adata.var["mt"]   = adata.var_names.str.startswith("MT-")
-adata.var["ribo"] = adata.var_names.str.startswith(("RPS", "RPL"))
-adata.var["hb"]   = adata.var_names.str.contains("^HB[^(P)]")
- 
-sc.pp.calculate_qc_metrics(adata, qc_vars=["mt", "ribo", "hb"], inplace=True, log1p=True)
- 
-# Visualize QC metrics
-sc.pl.violin(adata, ["n_genes_by_counts", "total_counts", "pct_counts_mt"], jitter=0.4, multi_panel=True)
-sc.pl.scatter(adata, "total_counts", "n_genes_by_counts", color="pct_counts_mt")
- 
-# Permissive filtering
-sc.pp.filter_cells(adata, min_genes=100)
-sc.pp.filter_genes(adata, min_cells=3)
-```
- 
-> **Tip:** For multi-batch datasets, perform QC per sample individually, as thresholds can vary substantially between batches.
- 
----
- 
-### Step 3 — Doublet Detection
- 
-Detect and flag cell doublets using Scrublet.
- 
-```python
-sc.external.pp.scrublet(adata, batch_key="sample")
-# Adds `doublet_score` and `predicted_doublet` to adata.obs
-```
- 
-> **Alternatives:** [DoubletDetection](https://github.com/JonathanShor/DoubletDetection), [SOLO (scvi-tools)](https://docs.scvi-tools.org/en/stable/user_guide/models/solo.html)
- 
----
- 
-### Step 4 — Normalization
- 
-Normalize to median count depth, then log1p-transform.
- 
-```python
-adata.layers["counts"] = adata.X.copy()  # Save raw counts
- 
-sc.pp.normalize_total(adata)   # Median count depth normalization
-sc.pp.log1p(adata)             # Log1p transformation (log1PF)
-```
- 
----
- 
-### Step 5 — Feature Selection
- 
-Select the top 2,000 highly variable genes per batch for downstream analysis.
- 
-```python
-sc.pp.highly_variable_genes(adata, n_top_genes=2000, batch_key="sample")
-sc.pl.highly_variable_genes(adata)
-```
- 
----
- 
-### Step 6 — Dimensionality Reduction
- 
-Run PCA to capture the main axes of variation.
- 
-```python
-sc.tl.pca(adata)
-sc.pl.pca_variance_ratio(adata, n_pcs=50, log=True)  # Inspect elbow to choose # of PCs
-```
- 
----
- 
-### Step 7 — Visualization (UMAP)
- 
-Build a neighborhood graph and embed in 2D with UMAP.
- 
-```python
-sc.pp.neighbors(adata)
-sc.tl.umap(adata)
-sc.pl.umap(adata, color="sample")
-```
- 
----
- 
-### Step 8 — Clustering (Leiden)
- 
-Cluster cells using the Leiden graph-clustering algorithm at multiple resolutions.
- 
-```python
-#sc.tl.leiden(adata, flavor="igraph")
-sc.tl.leiden(adata)
- 
-sc.pl.umap(adata, color=["leiden"])
-```
- 
----
- 
-### Step 9 — Re-assess QC & Filter Doublets
- 
-Visualize doublet scores on UMAP, then remove predicted doublets.
- 
-```python
-adata.obs["predicted_doublet"] = adata.obs["predicted_doublet"].astype("category")
-sc.pl.umap(adata, color=["leiden", "predicted_doublet", "doublet_score"], wspace=0.5)
- 
-adata = adata[~adata.obs["predicted_doublet"].to_numpy()].copy()
-sc.pl.umap(
-    adata, color=["leiden", "log1p_total_counts", "pct_counts_mt", "log1p_n_genes_by_counts"], wspace=0.5, ncols=2
-)
-```
-
-#### Leiden clustering algorithm
-
-```python
-sc.tl.leiden(adata, key_added="leiden_res0_02", resolution=0.02)
-sc.tl.leiden(adata, key_added="leiden_res0_5", resolution=0.5)
-sc.tl.leiden(adata, key_added="leiden_res2", resolution=2)
-
-sc.pl.umap(
-    adata,
-    color=["leiden_res0_02", "leiden_res0_5", "leiden_res2"],
-    legend_loc="on data",
-)
-```
-
----
- 
-### Step 10 — Cell-Type Annotation
- 
-Three complementary approaches:
- 
-#### A) Marker Gene Dotplot
- 
-```python
-marker_genes = {
-    "CD14+ Mono": ["FCN1", "CD14"],
-    "CD16+ Mono": ["TCF7L2", "FCGR3A", "LYN"],
-    "NK":         ["GNLY", "NKG7", "CD247"],
-    "CD4+ T":     ["CD4", "IL7R", "TRBC2"],
-    "CD8+ T":     ["CD8A", "CD8B", "GZMK"],
-    "B cells":    ["MS4A1", "ITGB1", "PAX5"],
-    "Plasma":     ["MZB1", "HSP90B1", "JCHAIN"],
-    # ... (see notebook for full list)
-}
-sc.pl.dotplot(adata, marker_genes, groupby="leiden_res0_5")
-```
- 
-#### B) Automatic Annotation — CellTypist
- 
-```python
-import celltypist as ct
- 
-ct.models.download_models(model=["Immune_All_Low.pkl"], force_update=True)
-predictions = ct.annotate(adata, model="Immune_All_Low.pkl",
-                          majority_voting=True, over_clustering="leiden_res0_5")
-adata = predictions.to_adata()
-sc.pl.umap(adata, color="majority_voting")
-```
- 
-#### C) Enrichment-Based Annotation — decoupler + PanglaoDB
- 
-```python
-import decoupler as dc
- 
-markers = dc.get_resource("PanglaoDB")
-# Filter for human canonical markers
-dc.run_mlm(adata, net=markers.rename(columns=dict(cell_type="source", genesymbol="target")),
-           weight=None, use_raw=False)
- 
-# Assign cluster labels by max enrichment score
-acts = dc.get_acts(adata, obsm_key="mlm_estimate")
-sc.pl.umap(acts, color=["majority_voting", "B cells", "T cells", "Monocytes", "NK cells"],
-           wspace=0.5, ncols=3, cmap="RdBu_r", vmin=-2, vmax=2)
-```
- 
----
- 
-### Step 11 — Differential Expression
- 
-Find cluster-specific marker genes using Wilcoxon/t-test.
- 
-```python
-sc.tl.rank_genes_groups(adata, groupby="leiden_res0_5")
-sc.tl.filter_rank_genes_groups(adata, min_fold_change=1.5)
-sc.pl.rank_genes_groups_dotplot(adata, groupby="leiden_res0_5", standard_scale="var", n_genes=5)
-```
- 
----
- 
-## 📚 References
+##  References
  
 - Luecken et al. (2021) — NeurIPS 2021 benchmarking dataset
 - McCarthy et al. (2017) — scater QC metrics
@@ -521,7 +304,7 @@ sc.pl.rank_genes_groups_dotplot(adata, groupby="leiden_res0_5", standard_scale="
 - [Single Cell Best Practices Book](https://www.sc-best-practices.org/)
 ---
  
-## 🔗 Resources
+##  Resources
  
 - [Scanpy Documentation](https://scanpy.readthedocs.io/)
 - [AnnData Documentation](https://anndata.readthedocs.io/)
