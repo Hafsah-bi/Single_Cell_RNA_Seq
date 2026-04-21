@@ -246,32 +246,6 @@ This repository is based on the following tutorial:
 
 # Basic scRNA-seq analysis
 
-A step-by-step single-cell RNA sequencing (scRNA-seq) analysis pipeline using **Scanpy**, covering quality control, normalization, dimensionality reduction, clustering, and cell-type annotation.
-
----
-
-##  Notebook
-
-`basic-scrna-tutorial_updated.ipynb`
-
----
-
-##  Dependencies
- 
-| Package | Purpose |
-|---|---|
-| `scanpy` | Core scRNA-seq analysis |
-| `anndata` | Data structure (AnnData) |
-| `pooch` | Data download/caching |
-| `scrublet` | Doublet detection |
-| `leidenalg` / `igraph` | Graph-based clustering |
-| `celltypist` | Automatic cell-type annotation |
-| `decoupler` | Enrichment-based annotation |
-| `omnipath` | PanglaoDB marker database |
- 
-
-# Single-Cell RNA-seq Preprocessing, Clustering, and Annotation
-
 This repository contains a Python notebook that walks through a complete **single-cell RNA-seq (scRNA-seq)** analysis workflow using **Scanpy**, **CellTypist**, and **decoupler**.
 
 The dataset consists of **bone marrow mononuclear cells from healthy human donors**. The workflow covers the major stages of a standard scRNA-seq analysis pipeline, including:
@@ -289,6 +263,21 @@ The dataset consists of **bone marrow mononuclear cells from healthy human donor
 - Marker gene discovery
 
 The notebook is designed as a practical end-to-end tutorial for preprocessing and interpreting scRNA-seq data in Python.
+
+---
+
+##  Dependencies
+ 
+| Package | Purpose |
+|---|---|
+| `scanpy` | Core scRNA-seq analysis |
+| `anndata` | Data structure (AnnData) |
+| `pooch` | Data download/caching |
+| `scrublet` | Doublet detection |
+| `leidenalg` / `igraph` | Graph-based clustering |
+| `celltypist` | Automatic cell-type annotation |
+| `decoupler` | Enrichment-based annotation |
+| `omnipath` | PanglaoDB marker database |
 
 ---
 
