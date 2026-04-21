@@ -693,33 +693,6 @@ By the end of the notebook, the workflow provides:
 
 ---
 
-## Requirements
-
-The notebook uses the following Python packages:
-
-- `anndata`
-- `scanpy`
-- `pooch`
-- `scrublet`
-- `leidenalg`
-- `igraph`
-- `celltypist`
-- `decoupler`
-- `omnipath`
-
-A typical installation sequence used in the notebook includes:
-
-```bash
-pip install anndata
-pip install scanpy
-pip install scrublet
-pip install leidenalg
-pip install --upgrade scanpy igraph leidenalg
-pip install celltypist
-pip install decoupler
-pip install omnipath
----
-
 ##  References
  
 - Luecken et al. (2021) — NeurIPS 2021 benchmarking dataset
@@ -728,6 +701,7 @@ pip install omnipath
 - Traag et al. (2019) — Leiden clustering algorithm
 - Domínguez Conde et al. (2022) — CellTypist immune atlas
 - [Single Cell Best Practices Book](https://www.sc-best-practices.org/)
+
 ---
  
 ##  Resources
