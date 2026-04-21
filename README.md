@@ -255,23 +255,7 @@ A step-by-step single-cell RNA sequencing (scRNA-seq) analysis pipeline using **
 `basic-scrna-tutorial_updated.ipynb`
 
 ---
- 
-## Overview
-This tutorial walks through a complete scRNA-seq analysis workflow on **bone marrow mononuclear cells** from healthy human donors (OpenProblems NeurIPS 2021 benchmarking dataset), measured with the **10X Multiome Gene Expression and Chromatin Accessibility kit**.
- 
-**Dataset:** 8,785 cells × 36,601 genes across 2 samples (`s1d1`, `s1d3`)
- 
----
- 
-##  Installation
- 
-```bash
-pip install anndata scanpy pooch scrublet leidenalg celltypist decoupler omnipath
-pip install --upgrade scanpy igraph leidenalg
-```
- 
----
- 
+
 ##  Dependencies
  
 | Package | Purpose |
@@ -285,15 +269,468 @@ pip install --upgrade scanpy igraph leidenalg
 | `decoupler` | Enrichment-based annotation |
 | `omnipath` | PanglaoDB marker database |
  
----
- 
-##  Workflow
- 
 
-```
- 
+# Single-Cell RNA-seq Preprocessing, Clustering, and Annotation
+
+This repository contains a Python notebook that walks through a complete **single-cell RNA-seq (scRNA-seq)** analysis workflow using **Scanpy**, **CellTypist**, and **decoupler**.
+
+The dataset consists of **bone marrow mononuclear cells from healthy human donors**. The workflow covers the major stages of a standard scRNA-seq analysis pipeline, including:
+
+- Data loading
+- Quality control
+- Filtering
+- Doublet detection
+- Normalization
+- Feature selection
+- Dimensionality reduction
+- Clustering
+- Visualization
+- Cell-type annotation
+- Marker gene discovery
+
+The notebook is designed as a practical end-to-end tutorial for preprocessing and interpreting scRNA-seq data in Python.
+
 ---
- 
+
+## Preprocessing and clustering
+
+The data used in this tutorial contains **8,785 cells** and **36,601 measured genes**.
+
+This notebook demonstrates a basic preprocessing and clustering workflow on bone marrow mononuclear cells collected from healthy human donors. The samples were measured using the **10X Multiome Gene Expression and Chromatin Accessibility kit** and were part of the **OpenProblems NeurIPS 2021 benchmarking dataset**.
+
+### Tools used
+
+- **anndata** — storage and manipulation of annotated single-cell matrices
+- **scanpy** — preprocessing, visualization, clustering, and differential expression
+- **pooch** — dataset download and caching
+- **scrublet** — doublet detection
+- **celltypist** — automated cell-type annotation
+- **decoupler** — enrichment-based annotation and activity scoring
+
+---
+
+## Library Import and Plot Settings
+
+The notebook begins by importing the required Python libraries and configuring Scanpy plotting defaults.
+
+### Main steps
+
+- Import `anndata`, `pooch`, and `scanpy`
+- Configure plotting parameters with a white background and adjusted DPI for cleaner figures
+
+---
+
+## Data Download and Dataset Construction
+
+This section downloads the input data and constructs a combined `AnnData` object for downstream analysis.
+
+### Main steps
+
+- Download sample `.h5` files using `pooch`
+- Read each sample using `scanpy.read_10x_h5`
+- Make variable names unique
+- Concatenate multiple samples into a single dataset
+- Store sample labels in metadata
+- Ensure observation names are unique
+
+---
+
+## Quality Control
+
+Quality control metrics are computed to assess cell quality and identify potentially problematic cells before downstream analysis.
+
+### QC metrics calculated
+
+- Number of genes detected per cell
+- Total counts per cell
+- Percentage of counts from:
+  - Mitochondrial genes
+  - Ribosomal genes
+  - Hemoglobin genes
+
+### Main steps
+
+- Label mitochondrial genes using the `MT-` prefix
+- Label ribosomal genes using `RPS` and `RPL`
+- Label hemoglobin genes using a pattern match
+- Compute QC metrics with `scanpy.pp.calculate_qc_metrics`
+
+---
+
+## Quality Control Visualization
+
+This section generates plots to inspect QC distributions and identify outlier cells.
+
+### Visualizations included
+
+- Violin plots for:
+  - `n_genes_by_counts`
+  - `total_counts`
+  - `pct_counts_mt`
+- Scatter plot of:
+  - `total_counts` vs `n_genes_by_counts`
+  - Colored by mitochondrial percentage
+
+These plots help identify:
+
+- Low-quality cells
+- Potentially stressed or dying cells
+- Cells with unusual library sizes or gene counts
+
+---
+
+## Cell and Gene Filtering
+
+Basic filtering is applied to remove low-information cells and rarely detected genes.
+
+### Filtering strategy
+
+- Remove cells expressing fewer than **100 genes**
+- Remove genes detected in fewer than **3 cells**
+
+This notebook uses a relatively permissive first-pass filtering approach so that stricter QC decisions can be revisited later after clustering.
+
+---
+
+## Doublet detection
+
+Doublets are droplets that contain more than one cell, which can distort downstream analysis if not removed.
+
+This notebook uses **Scrublet** through Scanpy to detect likely doublets.
+
+### Main steps
+
+- Install and run `scrublet`
+- Detect doublets separately for each sample using `batch_key="sample"`
+- Store:
+  - `doublet_score`
+  - `predicted_doublet`
+
+### Notes
+
+Alternative doublet detection tools in the scverse ecosystem include:
+
+- DoubletDetection
+- SOLO
+
+---
+
+## Normalization
+
+The notebook applies count-depth normalization followed by log transformation.
+
+### Main steps
+
+- Save the original count matrix in `adata.layers["counts"]`
+- Normalize counts across cells using `scanpy.pp.normalize_total`
+- Log-transform expression values using `scanpy.pp.log1p`
+
+### Why this matters
+
+This step:
+
+- Adjusts for differences in sequencing depth
+- Reduces skewness in count distributions
+- Prepares the data for PCA, clustering, and visualization
+
+---
+
+## Feature selection
+
+Feature selection identifies genes with the most informative biological variation.
+
+### Main steps
+
+- Compute highly variable genes with `scanpy.pp.highly_variable_genes`
+- Select the top **2,000 highly variable genes**
+- Account for batch structure using `batch_key="sample"`
+- Visualize selected genes with `scanpy.pl.highly_variable_genes`
+
+---
+
+## Dimensionality Reduction
+
+Dimensionality reduction compresses the dataset into a smaller number of informative components.
+
+### Main steps
+
+- Run PCA using `scanpy.tl.pca`
+- Inspect explained variance with `scanpy.pl.pca_variance_ratio`
+
+### Why this matters
+
+PCA:
+
+- Denoises the data
+- Captures major axes of variation
+- Provides the representation used for neighborhood graph construction
+
+---
+
+## Neighborhood Graph and UMAP Embedding
+
+Cells are connected based on transcriptional similarity and projected into a two-dimensional space for visualization.
+
+### Main steps
+
+- Build the k-nearest neighbor graph with `scanpy.pp.neighbors`
+- Compute a UMAP embedding with `scanpy.tl.umap`
+- Visualize sample mixing with `scanpy.pl.umap(color="sample")`
+
+### Interpretation
+
+This step helps assess:
+
+- Overall dataset structure
+- Cluster separation
+- Possible batch effects across samples
+
+---
+
+## Clustering
+
+The notebook uses the **Leiden algorithm** to cluster cells based on the neighborhood graph.
+
+### Main steps
+
+- Install `leidenalg` and `igraph`
+- Run Leiden clustering with `scanpy.tl.leiden`
+- Store cluster labels in `adata.obs["leiden"]`
+- Visualize clusters on UMAP
+
+### Outcome
+
+This identifies groups of cells with similar transcriptional profiles, providing the basis for downstream annotation.
+
+---
+
+## Re-assess quality control and cell filtering
+
+After clustering, QC is revisited to identify whether some clusters are enriched for likely doublets or poor-quality cells.
+
+### Main steps
+
+- Convert `predicted_doublet` to categorical format
+- Plot:
+  - `leiden`
+  - `predicted_doublet`
+  - `doublet_score`
+- Remove cells predicted as doublets
+- Re-visualize QC metrics on UMAP:
+  - `log1p_total_counts`
+  - `pct_counts_mt`
+  - `log1p_n_genes_by_counts`
+
+### Why this matters
+
+This second-pass QC step helps refine the dataset using both technical metrics and cluster context.
+
+---
+
+## Cell-type annotation
+
+Cell-type annotation is performed using both **manual marker-based inspection** and **automated methods**.
+
+### Installed annotation tools
+
+- **CellTypist**
+- **decoupler**
+
+Annotation is approached in multiple ways to increase robustness and biological interpretability.
+
+---
+
+## Multi-Resolution Clustering
+
+Several Leiden resolutions are computed to compare clustering granularity.
+
+### Main steps
+
+- Compute clustering at:
+  - `resolution=0.02`
+  - `resolution=0.5`
+  - `resolution=2`
+- Store results in:
+  - `leiden_res0_02`
+  - `leiden_res0_5`
+  - `leiden_res2`
+- Compare these solutions visually on UMAP
+
+### Purpose
+
+This helps determine a clustering resolution that balances:
+
+- Biological interpretability
+- Separation of distinct cell populations
+- Avoidance of over-clustering
+
+---
+
+## Marker gene set
+
+A manually curated set of marker genes is defined for major immune and erythroid populations.
+
+### Example cell types included
+
+- CD14+ Mono
+- CD16+ Mono
+- cDC2
+- Erythroblast
+- Proerythroblast
+- NK
+- ILC
+- Naive CD20+ B
+- B cells
+- Plasma cells
+- Plasmablast
+- CD4+ T
+- CD8+ T
+- T naive
+- pDC
+
+### Purpose
+
+These marker sets serve as a reference for interpreting cluster identities through expression patterns.
+
+---
+
+## Marker-Based Cluster Visualization
+
+Marker expression is visualized across clustering solutions using dot plots.
+
+### Main steps
+
+- Plot marker genes grouped by `leiden_res0_02`
+- Plot marker genes grouped by `leiden_res0_5`
+
+### Goal
+
+This helps determine which clustering resolution best separates biologically meaningful cell populations.
+
+---
+
+## Automatic label prediction
+
+Automated annotation is performed using **CellTypist**.
+
+### Download CellTypist model
+
+The notebook downloads the **Immune_All_Low.pkl** reference model.
+
+### Predict cell type labels
+
+### Main steps
+
+- Load the CellTypist model
+- Run annotation with:
+  - `majority_voting=True`
+  - `over_clustering="leiden_res0_5"`
+- Convert predictions back into `AnnData`
+- Visualize predicted labels on UMAP
+
+### Note
+
+CellTypist expects log1p-normalized expression scaled to **10,000 counts per cell**, so deviations from that preprocessing may affect prediction accuracy.
+
+---
+
+## Annotation with enrichment analysis
+
+As a complementary strategy, the notebook uses **decoupler** together with **PanglaoDB** marker genes for enrichment-based annotation.
+
+### Main steps
+
+- Install and import `omnipath`
+- Retrieve PanglaoDB markers using `decoupler`
+- Filter markers for relevant entries
+- Remove duplicates
+- Run multivariate linear modeling with `dc.run_mlm`
+- Store enrichment results in `adata.obsm`
+
+### Outputs
+
+The enrichment analysis generates activity scores representing marker enrichment for different cell types across cells.
+
+---
+
+## Differentially-expressed Genes as Markers
+
+Cluster-specific marker genes are identified using differential expression analysis.
+
+### Main steps
+
+- Run `scanpy.tl.rank_genes_groups`
+- Filter marker genes by fold change
+- Visualize the top markers in a dot plot
+
+### Why this matters
+
+Differential expression helps validate cluster identity and discover genes that distinguish one cluster from others.
+
+---
+
+## Cluster-specific marker visualization
+
+The notebook further inspects marker genes from a selected cluster using UMAP and violin plots.
+
+### Main steps
+
+- Select representative genes from cluster 3:
+  - `LYZ`
+  - `ACTB`
+  - `S100A6`
+  - `S100A4`
+  - `CST3`
+- Plot their expression on UMAP
+- Plot violin plots across clusters
+
+### Purpose
+
+These plots help confirm whether the identified genes are specifically enriched in the selected cluster and support its biological annotation.
+
+---
+
+## Output
+
+By the end of the notebook, the workflow provides:
+
+- A filtered and normalized scRNA-seq dataset
+- Cluster assignments
+- UMAP visualizations
+- Doublet predictions
+- Cell-type annotations from CellTypist
+- Enrichment-based annotations from decoupler
+- Differentially expressed marker genes for each cluster
+
+---
+
+## Requirements
+
+The notebook uses the following Python packages:
+
+- `anndata`
+- `scanpy`
+- `pooch`
+- `scrublet`
+- `leidenalg`
+- `igraph`
+- `celltypist`
+- `decoupler`
+- `omnipath`
+
+A typical installation sequence used in the notebook includes:
+
+```bash
+pip install anndata
+pip install scanpy
+pip install scrublet
+pip install leidenalg
+pip install --upgrade scanpy igraph leidenalg
+pip install celltypist
+pip install decoupler
+pip install omnipath
+---
+
 ##  References
  
 - Luecken et al. (2021) — NeurIPS 2021 benchmarking dataset
@@ -312,9 +749,6 @@ pip install --upgrade scanpy igraph leidenalg
 - [decoupler-py](https://github.com/saezlab/decoupler-py)
 - [PanglaoDB](https://panglaodb.se/)
 - [Single Cell Best Practices](https://www.sc-best-practices.org/)
-
-
-
 
 
 
