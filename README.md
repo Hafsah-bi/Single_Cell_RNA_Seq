@@ -710,8 +710,8 @@ By the end of the notebook, the workflow provides:
 A two-part tutorial series on working with **AnnData** — the core data structure for single-cell omics analysis in Python. These notebooks walk through building, annotating, subsetting, and exploring AnnData objects, from scratch construction to real-world dataset inspection.
 
 **Sources:**
-- 📖 [Getting started with anndata — anndata 0.13.0 documentation](https://anndata.readthedocs.io/en/latest/tutorials/notebooks/getting-started.html)
-- 📖 [Getting started with the anndata package — scverse-tutorials](https://scverse-tutorials.readthedocs.io/en/latest/notebooks/anndata_getting_started.html)
+-  [Getting started with anndata — anndata 0.13.0 documentation](https://anndata.readthedocs.io/en/latest/tutorials/notebooks/getting-started.html)
+-  [Getting started with the anndata package — scverse-tutorials](https://scverse-tutorials.readthedocs.io/en/latest/notebooks/anndata_getting_started.html)
 
 ---
  
