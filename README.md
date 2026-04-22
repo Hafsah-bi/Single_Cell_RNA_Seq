@@ -1,6 +1,20 @@
 # Single_Cell_RNA_Seq
 This repository organizes learning materials and practical references for single-cell RNA-seq into three core sections: 10x data pre-processing, basic scRNA-seq analysis, and AnnData fundamentals.
 
+---
+
+##  Repository Structure
+
+```Single_Cell_RNA_Seq-pipeline/
+├── 1_preprocessing_10X_Single_Cell_RNA/        # Stage 1: 10X FASTQ demultiplexing & QC on Galaxy (GTN)
+├── 2_basic_scrna_seq_tutorial/        # Stage 2: Core scRNA-seq analysis (Scanpy, Google Colab)
+├── 3_AnnData for Single-Cell Analysis/    # Stage 3: AnnData object handling & cell type annotation
+└── README.md
+```
+
+---
+
+
 # 1. Pre-processing of 10x Single-Cell RNA Datasets
 
 ## Introduction: Understand the 10x Genomics Workflow
