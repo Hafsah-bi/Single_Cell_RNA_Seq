@@ -254,12 +254,6 @@ These steps establish the foundation for downstream single-cell RNA-seq analyses
 
 ---
 
-## Reference
-
-This repository is based on the following tutorial:
-
-- [Galaxy Training Network: Pre-processing of 10x Single-Cell RNA Datasets](https://training.galaxyproject.org/training-material/topics/single-cell/tutorials/scrna-preprocessing-tenx/tutorial.html)
-
 # 2. Basic scRNA-seq analysis
 
 This repository contains a Python notebook that walks through a complete **single-cell RNA-seq (scRNA-seq)** analysis workflow using **Scanpy**, **CellTypist**, and **decoupler**.
@@ -709,26 +703,6 @@ By the end of the notebook, the workflow provides:
 
 ---
 
-##  References
- 
-- Luecken et al. (2021) — NeurIPS 2021 benchmarking dataset
-- McCarthy et al. (2017) — scater QC metrics
-- Wolock et al. (2019) — Scrublet doublet detection
-- Traag et al. (2019) — Leiden clustering algorithm
-- Domínguez Conde et al. (2022) — CellTypist immune atlas
-- [Single Cell Best Practices Book](https://www.sc-best-practices.org/)
-
----
- 
-##  Resources
- 
-- [Scanpy Documentation](https://scanpy.readthedocs.io/)
-- [AnnData Documentation](https://anndata.readthedocs.io/)
-- [CellTypist](https://github.com/Teichlab/celltypist)
-- [decoupler-py](https://github.com/saezlab/decoupler-py)
-- [PanglaoDB](https://panglaodb.se/)
-- [Single Cell Best Practices](https://www.sc-best-practices.org/)
-
 # 3.  AnnData for Single-Cell Analysis
  
 A two-part tutorial series on working with **AnnData** — the core data structure for single-cell omics analysis in Python. These notebooks walk through building, annotating, subsetting, and exploring AnnData objects, from scratch construction to real-world dataset inspection.
@@ -892,11 +866,16 @@ adata_copy = adata[:5, :10].copy()
 A view becomes a real object automatically when you modify its `.obs` or other metadata. After materialization, changes to the parent no longer affect it.
  
 ---
- 
-## References
- 
-- [AnnData Documentation](https://anndata.readthedocs.io/)
-- [Scanpy Documentation](https://scanpy.readthedocs.io/)
-- [scverse Tutorials](https://scverse.org/tutorials/)
+
+## All Tutorial Sources
+
+| Stage | Tutorial | URL |
+|-------|----------|-----|
+| 1 | GTN: Hands-on Pre-processing of 10X scRNA Datasets | https://training.galaxyproject.org/training-material/topics/single-cell/tutorials/scrna-preprocessing-tenx/tutorial.html |
+| 2 | scverse: basic-scrna-tutorial.ipynb | https://github.com/scverse/scanpy-tutorials/blob/main/basic-scrna-tutorial.ipynb |
+| 3a | AnnData Getting Started (anndata docs v0.13) | https://anndata.readthedocs.io/en/latest/tutorials/notebooks/getting-started.html |
+| 3b | AnnData Getting Started (scverse-tutorials) | https://scverse-tutorials.readthedocs.io/en/latest/notebooks/anndata_getting_started.html |
+
+---
 
 
