@@ -258,6 +258,8 @@ These steps establish the foundation for downstream single-cell RNA-seq analyses
 
 This repository contains a Python notebook that walks through a complete **single-cell RNA-seq (scRNA-seq)** analysis workflow using **Scanpy**, **CellTypist**, and **decoupler**.
 
+**Source:** [scverse/scanpy-tutorials — `basic-scrna-tutorial.ipynb`](https://github.com/scverse/scanpy-tutorials/blob/main/basic-scrna-tutorial.ipynb)
+
 The dataset consists of **bone marrow mononuclear cells from healthy human donors**. The workflow covers the major stages of a standard scRNA-seq analysis pipeline, including:
 
 - Data loading
@@ -706,7 +708,11 @@ By the end of the notebook, the workflow provides:
 # 3.  AnnData for Single-Cell Analysis
  
 A two-part tutorial series on working with **AnnData** — the core data structure for single-cell omics analysis in Python. These notebooks walk through building, annotating, subsetting, and exploring AnnData objects, from scratch construction to real-world dataset inspection.
- 
+
+**Sources:**
+- 📖 [Getting started with anndata — anndata 0.13.0 documentation](https://anndata.readthedocs.io/en/latest/tutorials/notebooks/getting-started.html)
+- 📖 [Getting started with the anndata package — scverse-tutorials](https://scverse-tutorials.readthedocs.io/en/latest/notebooks/anndata_getting_started.html)
+
 ---
  
 ## Overview
