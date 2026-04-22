@@ -756,33 +756,42 @@ This notebook builds an AnnData object from scratch using simulated data, demons
 - Creating a sparse count matrix with `csr_matrix` and `np.random.poisson`
 - Wrapping it in an `AnnData` object
 - Accessing the main matrix via `adata.X`
+  
 **2. Naming Observations and Variables**
 - Setting `adata.obs_names` (cell IDs) and `adata.var_names` (gene IDs)
 - Label-based slicing, similar to pandas
+  
 **3. Cell and Gene Annotations**
 - Adding cell-type labels to `adata.obs` using `pd.Categorical`
 - Filtering cells by annotation (e.g., selecting only B cells)
 - Rebuilding an AnnData object with a full metadata DataFrame
+  
 **4. Multi-dimensional Annotations**
 - Storing UMAP coordinates in `adata.obsm`
 - Storing gene-level matrices in `adata.varm`
+  
 **5. Unstructured Metadata**
 - Using `adata.uns` for results that don't fit row- or column-aligned tables
+  
 **6. Layers**
 - Storing log-transformed data alongside raw counts in `adata.layers`
 - Exporting a layer as a pandas DataFrame with `.to_df()`
+  
 **7. Saving and Loading**
 - Writing to `.h5ad` with gzip compression using `adata.write()`
 - Inspecting HDF5 contents with `h5ls`
 - Opening large files in backed mode (`backed='r'`) to avoid loading everything into RAM
 - Checking backed status with `adata.isbacked` and `adata.filename`
+  
 **8. Views vs. Copies**
 - Understanding when a subset is a view vs. an independent object
 - Using `.copy()` to avoid unintended side effects
 - How editing `.obs` on a view triggers `ImplicitModificationWarning` and materializes the view
+  
 **9. Metadata Queries**
 - Filtering by multiple values with `.isin()`
 - Conditional row selection using boolean masks on `.obs`
+  
 ---
  
 ## Part B — Understanding the AnnData Object
@@ -796,40 +805,49 @@ This notebook uses a real processed PBMC dataset (3k cells) from the scverse tut
 **1. Loading a Real Dataset**
 - Downloading a processed `.h5ad` file with `pooch` (with hash verification)
 - Reading it with `anndata.read_h5ad()`
+  
 **2. Exploring the Expression Matrix**
 - Inspecting `adata.X` (log-normalized counts in sparse format)
 - Examining non-zero values (`adata.X.data`), their positions (`adata.X.indices`), and sparsity fraction
+  
 **3. Working with Layers**
 - Listing available layers with `adata.layers`
 - Accessing raw counts via `adata.layers["raw"]`
 - Creating a new CPM (counts-per-million) normalized layer using `sc.pp.normalize_total()`
 - Comparing layers visually with `sc.pl.matrixplot()` for marker genes (CD8A, CD4, KLRB1)
+  
 **4. Cell Metadata with `.obs`**
 - Inspecting the full `.obs` DataFrame
 - Accessing and counting cells by type (e.g., B cells)
 - Adding a quality flag column (`is_low_quality`) based on mitochondrial percentage
 - Filtering out low-quality cells with boolean masking
+  
 **5. Gene Metadata with `.var`**
 - Inspecting the `.var` DataFrame
 - Replacing `var_names` with gene IDs from a metadata column
 - Subsetting genes by name using `.isin()` on `.var`
+  
 **6. Unstructured Metadata with `.uns`**
 - Listing `.uns` keys
 - Accessing stored Louvain clustering parameters and colors
 - Inspecting PCA variance explained
+  
 **7. Embeddings with `.obsm`**
 - Iterating over `.obsm` keys and shapes
 - Visualizing PCA, t-SNE, and UMAP embeddings side by side
 - Highlighting B cells with color mapping
+  
 **8. Pairwise Matrices with `.obsp`**
 - Accessing pairwise cell distances in `adata.obsp["distances_all"]`
 - Visualizing the distance matrix as a heatmap
 - Reordering cells by Louvain cell type to reveal block structure
+  
 **9. Views, Copies, and Object Materialization**
 - Demonstrating that subsets are initially views linked to parent data
 - Showing that parent modifications propagate to views
 - Using `.copy()` to create a fully independent object
 - Triggering view materialization by editing `.obs`, and confirming divergence from the parent
+  
 ---
  
 ## Key Concepts
