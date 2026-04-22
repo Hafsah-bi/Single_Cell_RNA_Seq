@@ -6,9 +6,11 @@ This repository organizes learning materials and practical references for single
 ##  Repository Structure
 
 ```Single_Cell_RNA_Seq-pipeline/
-├── 1_preprocessing_10X_Single_Cell_RNA/        # Stage 1: 10X FASTQ demultiplexing & QC on Galaxy (GTN)
-├── 2_basic_scrna_seq_tutorial/        # Stage 2: Core scRNA-seq analysis (Scanpy, Google Colab)
-├── 3_AnnData for Single-Cell Analysis/    # Stage 3: AnnData object handling & cell type annotation
+├── 1_preprocessing_10X_Single_Cell_RNA/        # Stage 1
+├── 2_basic_scrna_seq_tutorial/        # Stage 2
+├── 3_AnnData for Single-Cell Analysis/ # Stage 3
+└── anndata1
+└── anndata2
 └── README.md
 ```
 
